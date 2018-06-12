@@ -1,21 +1,26 @@
 <template>
-  <table class="grid">
-    <tr>
-      <cell name="1"></cell>
-      <cell name="2"></cell>
-      <cell name="3"></cell>
-    </tr>
-    <tr>
-      <cell name="4"></cell>
-      <cell name="5"></cell>
-      <cell name="6"></cell>
-    </tr>
-    <tr>
-      <cell name="7"></cell>
-      <cell name="8"></cell>
-      <cell name="9"></cell>
-    </tr>
-  </table>
+  <div>
+    <div class="gameStatus" :class="gameStatusColor">
+      {{ gameStatusMessage }}
+    </div>
+    <table class="grid">
+      <tr>
+        <cell name="1"></cell>
+        <cell name="2"></cell>
+        <cell name="3"></cell>
+      </tr>
+      <tr>
+        <cell name="4"></cell>
+        <cell name="5"></cell>
+        <cell name="6"></cell>
+      </tr>
+      <tr>
+        <cell name="7"></cell>
+        <cell name="8"></cell>
+        <cell name="9"></cell>
+      </tr>
+    </table>
+  </div>
 </template>
 
 <script>
@@ -26,7 +31,7 @@
     components: {
       cell
     },
-    data () {
+    data() {
       return {
         activePlayer: 'O',
         gameStatus: 'turn',
@@ -46,7 +51,7 @@
       }
     },
     computed: {
-      nonActivePlayer () {
+      nonActivePlayer() {
         if (this.activePlayer === 'O') {
           return 'X'
         }
@@ -54,19 +59,87 @@
       }
     },
     methods: {
-      changePlayer () {
+      changePlayer() {
+
         this.activePlayer = this.nonActivePlayer;
+
+      },
+      checkForWin () {
+        for (let i = 0; i < this.winConditions.length; i++) {
+
+          let wc = this.winConditions[i];
+          let cells = this.cells;
+
+          if (this.areEqual(cells[wc[0]], cells[wc[1]], cells[wc[2]])) {
+            return true;
+          }
+        }
+
+        return false;
+      },
+      changeGameStatus() {
+        if (this.checkForWin()) {
+
+          return this.gameIsWon()
+
+        } else if (this.moves === 9) {
+
+          return 'draw'
+
+        }
+
+        return 'turn'
+      },
+
+      areEqual () {
+        let len = arguments.length;
+
+        for (let i = 1; i < len; i++) {
+          if (arguments[i] === '' || arguments[i] !== arguments[i - 1])
+            return false;
+        }
+
+        return true;
+      },
+      gameIsWon () {
+        Event.$emit('win', this.activePlayer);
+
+        this.gameStatusMessage = `${this.activePlayer} Wins!`;
+
+        Event.$emit('freeze');
+
+        return 'win';
       }
     },
+    watch: {
+      gameStatus () {
+        if (this.gameStatus === 'win') {
+          this.gameStatusColor = 'statusWin'
+          return
+        } else if (this.gameStatus === 'draw') {
+          this.gameStatusColor = 'statusDraw'
+          this.gameStatusMessage = 'Draw !'
+
+          return
+        }
+      }
+    },
+
     created() {
       Event.$on('strike', (cellNumber) => {
+        this.gameStatusMessage = `${this.nonActivePlayer}'s turn`
+
         this.cells[cellNumber] = this.activePlayer;
 
         this.moves++;
 
-        // this.gameStatus = this.changeGameStatus();
+        this.gameStatus = this.changeGameStatus();
 
         this.changePlayer();
+      })
+
+      Event.$on('gridReset', () => {
+        Object.assign(this.$data, this.$options.data())
       })
     }
   }
