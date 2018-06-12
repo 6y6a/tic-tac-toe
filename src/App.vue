@@ -31,7 +31,7 @@
 <style lang="scss">
 
   body {
-    background-color: #fff;
+    background-color: #FFEE58;
     color: #fff;
     font-family: 'Dosis', Helvetica, sans-serif;
     -webkit-font-smoothing: antialiased;
