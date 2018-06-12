@@ -44,6 +44,30 @@
           [1, 5, 9], [3, 5, 7]
         ]
       }
+    },
+    computed: {
+      nonActivePlayer () {
+        if (this.activePlayer === 'O') {
+          return 'X'
+        }
+        return 'O'
+      }
+    },
+    methods: {
+      changePlayer () {
+        this.activePlayer = this.nonActivePlayer;
+      }
+    },
+    created() {
+      Event.$on('strike', (cellNumber) => {
+        this.cells[cellNumber] = this.activePlayer;
+
+        this.moves++;
+
+        // this.gameStatus = this.changeGameStatus();
+
+        this.changePlayer();
+      })
     }
   }
 </script>
