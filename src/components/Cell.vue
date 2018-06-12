@@ -3,9 +3,16 @@
 </template>
 
 <script>
-    export default {
-        name: "Cell"
+  export default {
+    name: "Cell",
+    props: ['name'],
+    data () {
+      return {
+        frozen: false,
+        mark: ''
+      }
     }
+  }
 </script>
 
 <style scoped lang="scss">

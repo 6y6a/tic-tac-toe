@@ -17,7 +17,13 @@
       board
     },
     data() {
-      return {}
+      return {
+        matches: 0,
+        wins: {
+          o: 0,
+          x: 0
+        }
+      }
     }
   }
 </script>
